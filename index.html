@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Pedidos de Licores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-void:#15120f;
+    --bg-void-2:#1d1813;
+    --paper:#fbf3e3;
+    --paper-2:#f5ead3;
+    --ink:#241c14;
+    --ink-soft:#7a6a52;
+    --line:#d9c8a3;
+    --amber:#e8a33d;
+    --amber-dark:#c17f1f;
+    --rust:#b23a2e;
+    --green:#4f7a3c;
+    --shadow: 0 18px 40px -20px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 20% 0%, #23180f 0%, transparent 45%),
+      radial-gradient(circle at 90% 10%, #2a1a10 0%, transparent 40%),
+      var(--bg-void);
+    color:var(--paper);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding:0 0 80px;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:22px 16px 0;}
+
+  /* ---------- header ---------- */
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
+  h1{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:44px;
+    letter-spacing:.5px;
+    line-height:.9;
+    margin:0;
+    color:var(--amber);
+    text-shadow:0 2px 0 rgba(0,0,0,.4);
+  }
+  header p{margin:4px 0 0;color:#c7b79b;font-size:13.5px;}
+  .stats{display:flex;gap:10px;}
+  .stat{
+    background:var(--bg-void-2);
+    border:1px solid #3a2e20;
+    border-radius:10px;
+    padding:8px 14px;
+    text-align:center;
+    min-width:64px;
+  }
+  .stat b{display:block;font-family:'Space Mono',monospace;font-size:19px;color:var(--amber);}
+  .stat span{font-size:10.5px;color:#a9967a;}
+
+  /* ---------- ticket base ---------- */
+  .ticket{
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:4px;
+    position:relative;
+    box-shadow:var(--shadow);
+    margin-bottom:22px;
+  }
+  .ticket::after{
+    content:"";
+    position:absolute;
+    left:0;right:0;bottom:-9px;height:9px;
+    background:
+      linear-gradient(-45deg, var(--bg-void) 6px, transparent 0),
+      linear-gradient(45deg, var(--bg-void) 6px, transparent 0);
+    background-size:14px 14px;
+    background-repeat:repeat-x;
+  }
+
+  /* ---------- form ticket ---------- */
+  .form-ticket{padding:20px 20px 26px;}
+  .form-ticket h2{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:24px;
+    letter-spacing:.4px;
+    margin:0 0 14px;
+    border-bottom:2px dashed var(--line);
+    padding-bottom:10px;
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .field{margin-bottom:12px;}
+  .field.full{grid-column:1/-1;}
+  label{
+    display:block;font-size:11.5px;font-weight:600;
+    color:var(--ink-soft);margin-bottom:5px;
+    text-transform:lowercase;
+  }
+  input,select,textarea{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    padding:10px 11px;
+    border:1.5px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink);
+  }
+  textarea{resize:vertical;min-height:44px;}
+  input:focus,select:focus,textarea:focus{
+    outline:none;border-color:var(--amber-dark);
+    box-shadow:0 0 0 3px rgba(232,163,61,.25);
+  }
+  .btn-primary{
+    width:100%;
+    margin-top:6px;
+    background:var(--rust);
+    color:#fff8ee;
+    border:none;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:19px;
+    letter-spacing:.6px;
+    padding:13px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:transform .08s ease, background .15s ease;
+  }
+  .btn-primary:hover{background:#9b2f25;}
+  .btn-primary:active{transform:scale(.98);}
+  .error-msg{color:var(--rust);font-size:12.5px;margin-top:-6px;margin-bottom:10px;min-height:14px;}
+
+  .line-item{
+    display:grid;
+    grid-template-columns:1fr 64px 30px;
+    gap:8px;
+    margin-bottom:8px;
+    align-items:start;
+  }
+  .line-item input[type=number]{padding:10px 6px;text-align:center;}
+  .line-remove{
+    background:none;border:1.5px solid var(--line);border-radius:7px;
+    color:var(--rust);font-size:15px;font-weight:700;cursor:pointer;
+    height:41px;line-height:1;
+  }
+  .line-remove:disabled{opacity:.25;cursor:not-allowed;}
+  .line-otro{grid-column:1/-1;margin-top:-4px;}
+  .add-line{display:inline-block;margin-top:2px;}
+
+  /* ---------- controls / filters ---------- */
+  .controls{
+    display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;
+  }
+  .tabs{display:flex;gap:6px;background:var(--bg-void-2);padding:4px;border-radius:9px;border:1px solid #3a2e20;}
+  .tab{
+    border:none;background:transparent;color:#c7b79b;
+    font-family:'Inter',sans-serif;font-weight:600;font-size:13px;
+    padding:7px 12px;border-radius:6px;cursor:pointer;
+  }
+  .tab.active{background:var(--amber);color:#241c14;}
+  .controls input[type=date]{
+    flex:1;min-width:140px;background:var(--bg-void-2);border:1px solid #3a2e20;
+    color:var(--paper);border-radius:8px;padding:8px 10px;font-size:13px;
+  }
+  .link-btn{
+    background:none;border:none;color:var(--amber);font-size:12.5px;
+    text-decoration:underline;cursor:pointer;padding:4px;
+  }
+
+  /* ---------- order tickets ---------- */
+  .order{padding:16px 18px 22px;}
+  .order.entregado{opacity:.55;}
+  .order-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+  .order-cliente{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;}
+  .order-badge{
+    font-family:'Space Mono',monospace;font-size:11px;padding:3px 8px;border-radius:20px;
+    white-space:nowrap;height:fit-content;
+  }
+  .badge-pendiente{background:#f0d9ab;color:#7a4c10;}
+  .badge-entregado{background:#d7e6cc;color:var(--green);}
+  .badge-urgente{background:var(--rust);color:#fff;}
+  .order-row{
+    display:flex;justify-content:space-between;gap:10px;
+    font-size:14px;padding:6px 0;border-bottom:1px dashed var(--line);
+  }
+  .order-row:last-of-type{border-bottom:none;}
+  .order-row .k{color:var(--ink-soft);}
+  .order-row .v{font-weight:600;text-align:right;}
+  .order-notas{font-size:13px;color:var(--ink-soft);margin-top:8px;font-style:italic;}
+  .order-actions{display:flex;gap:8px;margin-top:12px;}
+  .mini-btn{
+    flex:1;font-family:'Inter',sans-serif;font-weight:600;font-size:12.5px;
+    padding:8px;border-radius:6px;border:1.5px solid var(--line);background:#fff;
+    cursor:pointer;color:var(--ink);
+  }
+  .mini-btn.done{border-color:var(--green);color:var(--green);}
+  .mini-btn.reopen{border-color:var(--amber-dark);color:var(--amber-dark);}
+  .mini-btn.danger{border-color:var(--rust);color:var(--rust);}
+  .mini-btn.print{border-color:var(--ink-soft);}
+
+  .empty{
+    text-align:center;color:#a9967a;font-size:14px;padding:30px 10px;
+  }
+
+  /* ---------- toast ---------- */
+  #toast{
+    position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);
+    background:var(--amber);color:#241c14;font-weight:700;font-size:14px;
+    padding:11px 18px;border-radius:9px;box-shadow:var(--shadow);
+    opacity:0;pointer-events:none;transition:all .25s ease;z-index:50;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .notify-row{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--bg-void-2);border:1px solid #3a2e20;border-radius:9px;
+    padding:9px 12px;margin-bottom:16px;font-size:12.5px;color:#c7b79b;
+  }
+  .notify-row button{
+    background:var(--amber);border:none;color:#241c14;font-weight:700;
+    font-size:12px;padding:6px 11px;border-radius:6px;cursor:pointer;
+  }
+  @media (max-width:420px){
+    h1{font-size:36px;}
+    .grid2{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Pedidos&nbsp;de&nbsp;Licores</h1>
+      <p id="fechaHoy"></p>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="statPend">0</b><span>pendientes</span></div>
+      <div class="stat"><b id="statHoy">0</b><span>hoy</span></div>
+    </div>
+  </header>
+
+  <div class="notify-row" id="notifyRow">
+    <span>Activa los avisos para no perder la hora de entrega.</span>
+    <button id="notifyBtn" type="button">Activar avisos</button>
+  </div>
+
+  <div class="ticket form-ticket">
+    <h2>Nuevo pedido</h2>
+    <form id="orderForm" novalidate>
+      <div class="field full">
+        <label for="cliente">nombre del cliente</label>
+        <input type="text" id="cliente" required>
+      </div>
+
+      <div class="field full">
+        <label>productos</label>
+        <div id="lineItems"></div>
+        <button type="button" id="addLine" class="link-btn add-line">+ agregar otro producto</button>
+      </div>
+
+      <div class="field full">
+        <label for="domicilio">domicilio</label>
+        <textarea id="domicilio" required placeholder="Calle, número, colonia, referencias..."></textarea>
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label for="telefono">teléfono</label>
+          <input type="tel" id="telefono" required placeholder="10 dígitos">
+        </div>
+        <div class="field">
+          <label for="fecha">fecha de entrega</label>
+          <input type="date" id="fecha" required>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label for="hora">hora de entrega</label>
+        <input type="time" id="hora" required>
+      </div>
+
+      <div class="field full">
+        <label for="notas">notas (opcional)</label>
+        <textarea id="notas" placeholder="Forma de pago, indicaciones extra..."></textarea>
+      </div>
+
+      <div class="error-msg" id="formError"></div>
+      <button type="submit" class="btn-primary">Levantar pedido</button>
+    </form>
+  </div>
+
+  <div class="controls">
+    <div class="tabs">
+      <button class="tab active" data-filter="pendiente">Pendientes</button>
+      <button class="tab" data-filter="entregado">Entregados</button>
+      <button class="tab" data-filter="todos">Todos</button>
+    </div>
+    <input type="date" id="filtroFecha">
+    <button class="link-btn" id="limpiarFecha" type="button">quitar filtro</button>
+  </div>
+
+  <div id="lista"></div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  const PRODUCTOS = [
+    "Ballena","Ballenón","Coronita","Modelo","Pacífico 1/4","Pacífico 1/2",
+    "Corona 1/2","Mega Güera","Mega Negra","Premium Negra","Premium Güera",
+    "Modelo Latón","Pacífico Amarillo","Pacífico Suave","Michelob Vidrio",
+    "Clamato 1/4","Modelo Latota","Latón Corona Extra","Otro"
+  ];
+
+  const $ = (id) => document.getElementById(id);
+
+  function productOptionsHtml(){
+    return PRODUCTOS.map(p=>`<option value="${p}">${p}</option>`).join('');
+  }
+
+  function createLineRow(){
+    const row = document.createElement('div');
+    row.className = 'line-item';
+    row.innerHTML = `
+      <select class="line-producto">${productOptionsHtml()}</select>
+      <input type="number" class="line-cantidad" min="1" value="1">
+      <button type="button" class="line-remove">&times;</button>
+      <input type="text" class="line-otro line-otro-input" style="display:none;" placeholder="especifica el producto">
+    `;
+    const sel = row.querySelector('.line-producto');
+    const otro = row.querySelector('.line-otro-input');
+    sel.addEventListener('change', ()=>{
+      otro.style.display = sel.value === 'Otro' ? 'block' : 'none';
+    });
+    row.querySelector('.line-remove').addEventListener('click', ()=>{
+      if(document.querySelectorAll('.line-item').length > 1){
+        row.remove();
+        updateRemoveButtons();
+      }
+    });
+    return row;
+  }
+
+  function updateRemoveButtons(){
+    const rows = document.querySelectorAll('.line-item .line-remove');
+    rows.forEach(btn => btn.disabled = rows.length === 1);
+  }
+
+  function addLineRow(){
+    $('lineItems').appendChild(createLineRow());
+    updateRemoveButtons();
+  }
+
+  function resetLineItems(){
+    $('lineItems').innerHTML = '';
+    addLineRow();
+  }
+
+  $('addLine').addEventListener('click', addLineRow);
+  resetLineItems();
+
+  const hoyISO = () => new Date().toISOString().slice(0,10);
+  $('fecha').value = hoyISO();
+  $('fechaHoy').textContent = new Date().toLocaleDateString('es-MX',{weekday:'long', day:'numeric', month:'long'});
+
+  let orders = [];
+  let currentFilter = 'pendiente';
+  let storageReady = false;
+
+  const STORAGE_KEY = 'orders-v1';
+
+  async function loadOrders(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      orders = raw ? JSON.parse(raw) : [];
+    }catch(e){
+      orders = [];
+    }
+    storageReady = true;
+    render();
+  }
+
+  async function saveOrders(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+    }catch(e){
+      showToast('No se pudo guardar. Revisa el espacio del navegador.');
+    }
+  }
+
+  function showToast(msg){
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(()=>t.classList.remove('show'), 2600);
+  }
+
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+  // ---------- form submit ----------
+  $('orderForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const errEl = $('formError');
+    errEl.textContent = '';
+
+    const cliente = $('cliente').value.trim();
+    const domicilio = $('domicilio').value.trim();
+    const telefono = $('telefono').value.trim();
+    const fecha = $('fecha').value;
+    const hora = $('hora').value;
+    const notas = $('notas').value.trim();
+
+    const productos = [];
+    const rows = document.querySelectorAll('.line-item');
+    for(const row of rows){
+      const sel = row.querySelector('.line-producto');
+      const cant = parseInt(row.querySelector('.line-cantidad').value, 10);
+      const otroInput = row.querySelector('.line-otro-input');
+      let nombre = sel.value;
+      if(nombre === 'Otro'){
+        nombre = otroInput.value.trim();
+        if(!nombre){ errEl.textContent = 'Especifica el nombre de cada producto marcado como "Otro".'; return; }
+      }
+      if(!cant || cant < 1){ errEl.textContent = 'Revisa las cantidades de cada producto.'; return; }
+      productos.push({ producto: nombre, cantidad: cant });
+    }
+
+    if(!cliente || !domicilio || !telefono || !fecha || !hora || productos.length === 0){
+      errEl.textContent = 'Completa todos los campos obligatorios.';
+      return;
+    }
+
+    const order = {
+      id: uid(), cliente, productos, domicilio, telefono,
+      fecha, hora, notas, estado: 'pendiente', avisado: false,
+      creado: Date.now()
+    };
+    orders.push(order);
+    await saveOrders();
+    showToast('Pedido de ' + cliente + ' registrado.');
+
+    const keepFecha = fecha;
+    e.target.reset();
+    $('fecha').value = keepFecha;
+    resetLineItems();
+    render();
+    $('cliente').focus();
+  });
+
+  // ---------- filters ----------
+  document.querySelectorAll('.tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      render();
+    });
+  });
+  $('filtroFecha').addEventListener('change', render);
+  $('limpiarFecha').addEventListener('click', ()=>{ $('filtroFecha').value=''; render(); });
+
+  // ---------- rendering ----------
+  function fmtFecha(iso){
+    const [y,m,d] = iso.split('-');
+    return d + '/' + m + '/' + y;
+  }
+  function fmtHora(hhmm){
+    const [h,m] = hhmm.split(':').map(Number);
+    const ap = h >= 12 ? 'pm' : 'am';
+    const h12 = ((h+11)%12)+1;
+    return h12 + ':' + String(m).padStart(2,'0') + ' ' + ap;
+  }
+  function isUrgente(o){
+    if(o.estado !== 'pendiente') return false;
+    const dt = new Date(o.fecha + 'T' + o.hora);
+    const diffMin = (dt - new Date())/60000;
+    return diffMin <= 30 && diffMin >= -60;
+  }
+
+  function render(){
+    if(!storageReady) return;
+    const lista = $('lista');
+    lista.innerHTML = '';
+
+    let filtered = orders.filter(o=>{
+      if(currentFilter !== 'todos' && o.estado !== currentFilter) return false;
+      if($('filtroFecha').value && o.fecha !== $('filtroFecha').value) return false;
+      return true;
+    });
+    filtered.sort((a,b)=> (a.fecha+a.hora).localeCompare(b.fecha+b.hora));
+
+    const today = hoyISO();
+    $('statPend').textContent = orders.filter(o=>o.estado==='pendiente').length;
+    $('statHoy').textContent = orders.filter(o=>o.fecha===today && o.estado==='pendiente').length;
+
+    if(filtered.length === 0){
+      lista.innerHTML = '<div class="ticket"><div class="empty">No hay pedidos aquí todavía.</div></div>';
+      return;
+    }
+
+    filtered.forEach(o=>{
+      const div = document.createElement('div');
+      div.className = 'ticket order' + (o.estado==='entregado' ? ' entregado' : '');
+      const urgente = isUrgente(o);
+      const badge = o.estado === 'entregado'
+        ? '<span class="order-badge badge-entregado">entregado</span>'
+        : urgente
+          ? '<span class="order-badge badge-urgente">entrega pronto</span>'
+          : '<span class="order-badge badge-pendiente">pendiente</span>';
+
+      div.innerHTML = `
+        <div class="order-top">
+          <div class="order-cliente">${escapeHtml(o.cliente)}</div>
+          ${badge}
+        </div>
+        ${productLines(o).map(li => `<div class="order-row"><span class="k">${escapeHtml(li.producto)}</span><span class="v">x${li.cantidad}</span></div>`).join('')}
+        <div class="order-row"><span class="k">domicilio</span><span class="v">${escapeHtml(o.domicilio)}</span></div>
+        <div class="order-row"><span class="k">teléfono</span><span class="v">${escapeHtml(o.telefono)}</span></div>
+        <div class="order-row"><span class="k">entrega</span><span class="v">${fmtFecha(o.fecha)} · ${fmtHora(o.hora)}</span></div>
+        ${o.notas ? `<div class="order-notas">${escapeHtml(o.notas)}</div>` : ''}
+        <div class="order-actions">
+          ${o.estado === 'pendiente'
+            ? `<button class="mini-btn done" data-action="done" data-id="${o.id}">Marcar entregado</button>`
+            : `<button class="mini-btn reopen" data-action="reopen" data-id="${o.id}">Reabrir</button>`}
+          <button class="mini-btn print" data-action="print" data-id="${o.id}">Imprimir</button>
+          <button class="mini-btn danger" data-action="delete" data-id="${o.id}">Eliminar</button>
+        </div>
+      `;
+      lista.appendChild(div);
+    });
+  }
+
+  function productLines(o){
+    if(Array.isArray(o.productos)) return o.productos;
+    if(o.producto) return [{ producto: o.producto, cantidad: o.cantidad }];
+    return [];
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  $('lista').addEventListener('click', async (e)=>{
+    const btn = e.target.closest('button[data-action]');
+    if(!btn) return;
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+    const order = orders.find(o=>o.id===id);
+    if(!order) return;
+
+    if(action === 'done'){
+      order.estado = 'entregado';
+      await saveOrders(); render();
+      showToast('Pedido de ' + order.cliente + ' marcado como entregado.');
+    } else if(action === 'reopen'){
+      order.estado = 'pendiente';
+      await saveOrders(); render();
+    } else if(action === 'delete'){
+      if(confirm('¿Eliminar el pedido de ' + order.cliente + '?')){
+        orders = orders.filter(o=>o.id!==id);
+        await saveOrders(); render();
+      }
+    } else if(action === 'print'){
+      printTicket(order);
+    }
+  });
+
+  function printTicket(o){
+    const w = window.open('', '_blank', 'width=380,height=600');
+    w.document.write(`
+      <html><head><title>Ticket</title>
+      <style>
+        body{font-family:'Space Mono',monospace;padding:18px;font-size:13px;color:#111;}
+        h2{font-family:sans-serif;margin:0 0 10px;}
+        .row{display:flex;justify-content:space-between;border-bottom:1px dashed #999;padding:5px 0;}
+        .foot{margin-top:14px;font-size:11px;color:#555;}
+      </style></head><body>
+      <h2>Pedido</h2>
+      <div class="row"><span>Cliente</span><span>${escapeHtml(o.cliente)}</span></div>
+      ${productLines(o).map(li => `<div class="row"><span>${escapeHtml(li.producto)}</span><span>x${li.cantidad}</span></div>`).join('')}
+      <div class="row"><span>Domicilio</span><span>${escapeHtml(o.domicilio)}</span></div>
+      <div class="row"><span>Teléfono</span><span>${escapeHtml(o.telefono)}</span></div>
+      <div class="row"><span>Entrega</span><span>${fmtFecha(o.fecha)} ${fmtHora(o.hora)}</span></div>
+      ${o.notas ? `<div class="foot">Notas: ${escapeHtml(o.notas)}</div>` : ''}
+      </body></html>
+    `);
+    w.document.close();
+    w.focus();
+    setTimeout(()=>w.print(), 250);
+  }
+
+  // ---------- notifications ----------
+  const notifyRow = $('notifyRow');
+  const notifyBtn = $('notifyBtn');
+  let notifyEnabled = false;
+
+  function beep(){
+    try{
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o1 = ctx.createOscillator();
+      const g = ctx.createGain();
+      o1.type = 'sine'; o1.frequency.value = 720;
+      g.gain.setValueAtTime(0.001, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      o1.connect(g); g.connect(ctx.destination);
+      o1.start(); o1.stop(ctx.currentTime + 0.4);
+    }catch(e){}
+  }
+
+  notifyBtn.addEventListener('click', async ()=>{
+    if(!('Notification' in window)){
+      notifyEnabled = true;
+      notifyRow.style.display = 'none';
+      return;
+    }
+    const perm = await Notification.requestPermission();
+    if(perm === 'granted'){
+      notifyEnabled = true;
+      notifyRow.style.display = 'none';
+      showToast('Avisos activados.');
+    }
+  });
+
+  function checkUpcoming(){
+    if(!storageReady) return;
+    let changed = false;
+    const now = new Date();
+    orders.forEach(o=>{
+      if(o.estado !== 'pendiente' || o.avisado) return;
+      const dt = new Date(o.fecha + 'T' + o.hora);
+      const diffMin = (dt - now) / 60000;
+      if(diffMin <= 20 && diffMin >= -30){
+        o.avisado = true;
+        changed = true;
+        beep();
+        showToast('Entrega pronto: ' + o.cliente + ' — ' + fmtHora(o.hora));
+        if(notifyEnabled && 'Notification' in window && Notification.permission === 'granted'){
+          const resumen = productLines(o).map(li => li.producto + ' x' + li.cantidad).join(', ');
+          new Notification('Entrega pronto', {
+            body: o.cliente + ' · ' + resumen + ' · ' + o.domicilio
+          });
+        }
+      }
+    });
+    if(changed) saveOrders();
+    render();
+  }
+  setInterval(checkUpcoming, 30000);
+
+  loadOrders();
+})();
+</script>
+</body>
+</html>
