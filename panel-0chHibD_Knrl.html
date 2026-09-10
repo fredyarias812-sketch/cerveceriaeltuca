@@ -175,9 +175,7 @@
   <!-- ===== VISTA: NUEVO PEDIDO ===== -->
   <div class="view" id="view-nuevo">
     <div class="ticket form-ticket">
-      <h2><span id="formTitulo">Levantar pedido (manual)</span>
-        <button type="button" class="cancel-edit" id="cancelEdit" style="display:none;">cancelar edición</button>
-      </h2>
+      <h2>Levantar pedido (manual)</h2>
       <form id="orderForm" novalidate>
         <div class="field full">
           <label for="cliente">nombre del cliente</label>
@@ -236,6 +234,10 @@
       </div>
       <div id="semDesglose"></div>
     </div>
+    <div class="ticket resumen-card" style="text-align:center;">
+      <p class="resumen-sub" style="margin-bottom:10px;">Esto borra permanentemente todos los pedidos marcados como "entregado" (no afecta pendientes ni en camino).</p>
+      <button type="button" class="mini-btn danger" id="borrarHistorial" style="flex:none;padding:10px 18px;">Borrar historial de entregados</button>
+    </div>
   </div>
 </div>
 
@@ -258,14 +260,10 @@
   $('fechaHoy').textContent = new Date().toLocaleDateString('es-MX',{weekday:'long', day:'numeric', month:'long'});
 
   // ---------- navegación principal ----------
-  let editingId = null;
-
   document.querySelectorAll('.main-tab').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const view = btn.dataset.view;
-      if(view === 'nuevo' && editingId === null){
-        resetForm();
-      }
+      if(view === 'nuevo') resetForm();
       document.querySelectorAll('.main-tab').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
@@ -308,41 +306,15 @@
   }
   function addLineRow(){ $('lineItems').appendChild(createLineRow()); updateRemoveButtons(); }
   function resetLineItems(){ $('lineItems').innerHTML=''; addLineRow(); }
-  function setLineItemsFromData(productos){
-    $('lineItems').innerHTML = '';
-    (productos.length ? productos : [null]).forEach(p => $('lineItems').appendChild(createLineRow(p)));
-    updateRemoveButtons();
-  }
   $('addLine').addEventListener('click', addLineRow);
   resetLineItems();
 
   function resetForm(){
-    editingId = null;
     $('orderForm').reset();
     $('fecha').value = new Date().toISOString().slice(0,10);
     resetLineItems();
-    $('formTitulo').textContent = 'Levantar pedido (manual)';
-    $('submitBtn').textContent = 'Levantar pedido';
-    $('cancelEdit').style.display = 'none';
     $('formError').textContent = '';
   }
-
-  function populateEditForm(o){
-    editingId = o.id;
-    $('cliente').value = o.cliente;
-    $('domicilio').value = o.domicilio;
-    $('telefono').value = o.telefono;
-    $('fecha').value = o.fecha;
-    $('hora').value = o.hora;
-    $('notas').value = o.notas || '';
-    setLineItemsFromData(productLines(o));
-    $('formTitulo').textContent = 'Editar pedido de ' + o.cliente;
-    $('submitBtn').textContent = 'Guardar cambios';
-    $('cancelEdit').style.display = 'inline';
-    $('formError').textContent = '';
-    goToView('nuevo');
-  }
-  $('cancelEdit').addEventListener('click', ()=>{ resetForm(); goToView('pedidos'); });
 
   let orders = [];
   let currentFilter = 'pendiente';
@@ -411,21 +383,12 @@
     const btn = $('submitBtn');
     btn.disabled = true;
     try{
-      if(editingId){
-        await api('/api/pedido?id=' + editingId, {
-          method:'PATCH',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ cliente, productos, domicilio, telefono, fecha, hora, notas })
-        });
-        showToast('Pedido de ' + cliente + ' actualizado.');
-      } else {
-        await api('/api/pedidos', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ cliente, productos, domicilio, telefono, fecha, hora, notas })
-        });
-        showToast('Pedido de ' + cliente + ' registrado.');
-      }
+      await api('/api/pedidos', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ cliente, productos, domicilio, telefono, fecha, hora, notas })
+      });
+      showToast('Pedido de ' + cliente + ' registrado.');
       resetForm();
       goToView('pedidos');
       await fetchOrders();
@@ -488,7 +451,6 @@
     } else {
       btns += `<button class="mini-btn reopen" data-action="reopen" data-id="${o.id}">Reabrir</button>`;
     }
-    btns += `<button class="mini-btn edit" data-action="edit" data-id="${o.id}">Editar</button>`;
     btns += `<button class="mini-btn print" data-action="print" data-id="${o.id}">Imprimir</button>`;
     btns += `<button class="mini-btn danger" data-action="delete" data-id="${o.id}">Eliminar</button>`;
     return btns;
@@ -557,8 +519,6 @@
       } else if(action === 'pendiente' || action === 'reopen'){
         await api('/api/pedido?id=' + id, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ estado:'pendiente' }) });
         await fetchOrders();
-      } else if(action === 'edit'){
-        populateEditForm(order);
       } else if(action === 'delete'){
         if(confirm('¿Eliminar el pedido de ' + order.cliente + '?')){
           await api('/api/pedido?id=' + id, { method:'DELETE' });
@@ -631,6 +591,29 @@
     $('semArticulos').textContent = sem.totalArticulos;
     $('semDesglose').innerHTML = desgloseHtml(sem.porProducto);
   }
+
+  $('borrarHistorial').addEventListener('click', async ()=>{
+    const entregados = orders.filter(o => o.estado === 'entregado');
+    if(entregados.length === 0){ showToast('No hay pedidos entregados para borrar.'); return; }
+    if(!confirm('¿Borrar ' + entregados.length + ' pedido(s) marcados como entregado? Esto no se puede deshacer.')) return;
+
+    const btn = $('borrarHistorial');
+    btn.disabled = true;
+    btn.textContent = 'Borrando...';
+    try{
+      for(const o of entregados){
+        await api('/api/pedido?id=' + o.id, { method:'DELETE' });
+      }
+      showToast('Historial de entregados borrado.');
+      await fetchOrders();
+      renderResumen();
+    }catch(err){
+      showToast('Error al borrar: ' + err.message);
+    }finally{
+      btn.disabled = false;
+      btn.textContent = 'Borrar historial de entregados';
+    }
+  });
 
   // ---------- avisos ----------
   const notifyRow = $('notifyRow');
