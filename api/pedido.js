@@ -24,6 +24,14 @@ module.exports = async (req, res) => {
       const allowed = {};
       if (typeof updates.estado === 'string') allowed.estado = updates.estado;
       if (typeof updates.avisado === 'boolean') allowed.avisado = updates.avisado;
+      if (typeof updates.cliente === 'string') allowed.cliente = updates.cliente.slice(0, 200);
+      if (typeof updates.domicilio === 'string') allowed.domicilio = updates.domicilio.slice(0, 500);
+      if (typeof updates.telefono === 'string') allowed.telefono = updates.telefono.slice(0, 50);
+      if (typeof updates.fecha === 'string') allowed.fecha = updates.fecha;
+      if (typeof updates.hora === 'string') allowed.hora = updates.hora;
+      if (typeof updates.notas === 'string') allowed.notas = updates.notas.slice(0, 500);
+      if (Array.isArray(updates.productos) && updates.productos.length > 0) allowed.productos = updates.productos;
+
       const { data, error } = await supabase
         .from('pedidos')
         .update(allowed)
@@ -33,7 +41,7 @@ module.exports = async (req, res) => {
       if (error) throw error;
       res.status(200).json({ ok: true, pedido: data });
     } catch (e) {
-      res.status(500).json({ error: 'No se pudo actualizar el pedido.' });
+      res.status(500).json({ error: 'No se pudo actualizar el pedido.', detalle: e.message || String(e) });
     }
     return;
   }
