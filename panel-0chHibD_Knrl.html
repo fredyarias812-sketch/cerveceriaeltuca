@@ -99,6 +99,7 @@
   .mini-btn.reopen{border-color:var(--amber-dark);color:var(--amber-dark);}
   .mini-btn.danger{border-color:var(--rust);color:var(--rust);}
   .mini-btn.print{border-color:var(--ink-soft);}
+  .mini-btn.wa{border-color:#1f8a5a;color:#1f8a5a;}
   .mini-btn.edit{border-color:var(--amber-dark);color:var(--amber-dark);}
   .empty{text-align:center;color:#a9967a;font-size:14px;padding:30px 10px;}
 
@@ -451,6 +452,7 @@
     } else {
       btns += `<button class="mini-btn reopen" data-action="reopen" data-id="${o.id}">Reabrir</button>`;
     }
+    btns += `<button class="mini-btn wa" data-action="whatsapp" data-id="${o.id}">WhatsApp</button>`;
     btns += `<button class="mini-btn print" data-action="print" data-id="${o.id}">Imprimir</button>`;
     btns += `<button class="mini-btn danger" data-action="delete" data-id="${o.id}">Eliminar</button>`;
     return btns;
@@ -524,6 +526,8 @@
           await api('/api/pedido?id=' + id, { method:'DELETE' });
           await fetchOrders();
         }
+      } else if(action === 'whatsapp'){
+        abrirWhatsapp(order);
       } else if(action === 'print'){
         printTicket(order);
       }
@@ -531,6 +535,28 @@
       showToast('Error: ' + err.message);
     }
   });
+
+  function telefonoWhatsapp(tel){
+    const digits = (tel || '').replace(/\D/g, '');
+    if(digits.length === 10) return '52' + digits; // agrega código de México si son 10 dígitos
+    return digits;
+  }
+  function mensajeWhatsapp(o){
+    const productos = productLines(o).map(li => li.producto + ' x' + li.cantidad).join(', ');
+    const estadoTexto = {
+      pendiente: 'fue recibido y lo estamos preparando',
+      en_camino: 'ya va en camino',
+      entregado: 'fue entregado, ¡gracias por tu compra!'
+    }[o.estado] || 'está siendo procesado';
+    const link = window.location.origin + '/estado.html?id=' + o.id;
+    return `Hola ${o.cliente}, tu pedido (${productos}) ${estadoTexto}. Puedes ver el estado aquí: ${link}`;
+  }
+  function abrirWhatsapp(o){
+    const numero = telefonoWhatsapp(o.telefono);
+    if(!numero){ showToast('Ese pedido no tiene un teléfono válido.'); return; }
+    const url = 'https://wa.me/' + numero + '?text=' + encodeURIComponent(mensajeWhatsapp(o));
+    window.open(url, '_blank');
+  }
 
   function printTicket(o){
     const w = window.open('', '_blank', 'width=380,height=600');
