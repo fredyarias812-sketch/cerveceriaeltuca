@@ -10,7 +10,8 @@
   :root{
     --bg-void:#15120f; --bg-void-2:#1d1813; --paper:#fbf3e3; --ink:#241c14;
     --ink-soft:#7a6a52; --line:#d9c8a3; --amber:#e8a33d; --amber-dark:#c17f1f;
-    --rust:#b23a2e; --green:#4f7a3c; --shadow: 0 18px 40px -20px rgba(0,0,0,.6);
+    --rust:#b23a2e; --green:#4f7a3c; --teal:#2f6f66; --teal-bg:#cfe6e1;
+    --shadow: 0 18px 40px -20px rgba(0,0,0,.6);
   }
   *{box-sizing:border-box;}
   body{
@@ -21,14 +22,21 @@
       var(--bg-void);
     color:var(--paper); font-family:'Inter',sans-serif; min-height:100vh; padding:0 0 80px;
   }
-  .wrap{max-width:720px;margin:0 auto;padding:22px 16px 0;}
-  header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
+  .wrap{max-width:760px;margin:0 auto;padding:22px 16px 0;}
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:14px;flex-wrap:wrap;}
   h1{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:.5px;line-height:.9;margin:0;color:var(--amber);text-shadow:0 2px 0 rgba(0,0,0,.4);}
   header p{margin:4px 0 0;color:#c7b79b;font-size:13.5px;}
   .stats{display:flex;gap:10px;}
-  .stat{background:var(--bg-void-2);border:1px solid #3a2e20;border-radius:10px;padding:8px 14px;text-align:center;min-width:64px;}
+  .stat{background:var(--bg-void-2);border:1px solid #3a2e20;border-radius:10px;padding:8px 14px;text-align:center;min-width:60px;}
   .stat b{display:block;font-family:'Space Mono',monospace;font-size:19px;color:var(--amber);}
   .stat span{font-size:10.5px;color:#a9967a;}
+
+  /* ---- navegación principal ---- */
+  .main-tabs{display:flex;gap:6px;background:var(--bg-void-2);padding:5px;border-radius:11px;border:1px solid #3a2e20;margin-bottom:18px;}
+  .main-tab{flex:1;border:none;background:transparent;color:#c7b79b;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.4px;padding:9px 6px;border-radius:8px;cursor:pointer;}
+  .main-tab.active{background:var(--amber);color:#241c14;}
+  .view{display:none;}
+  .view.active{display:block;}
 
   .ticket{background:var(--paper);color:var(--ink);border-radius:4px;position:relative;box-shadow:var(--shadow);margin-bottom:22px;}
   .ticket::after{
@@ -37,7 +45,8 @@
     background-size:14px 14px;background-repeat:repeat-x;
   }
   .form-ticket{padding:20px 20px 26px;}
-  .form-ticket h2{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.4px;margin:0 0 14px;border-bottom:2px dashed var(--line);padding-bottom:10px;}
+  .form-ticket h2{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.4px;margin:0 0 14px;border-bottom:2px dashed var(--line);padding-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+  .form-ticket h2 .cancel-edit{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--rust);text-decoration:underline;cursor:pointer;background:none;border:none;}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   .field{margin-bottom:12px;}
   .field.full{grid-column:1/-1;}
@@ -57,10 +66,17 @@
 
   .controls{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
   .tabs{display:flex;gap:6px;background:var(--bg-void-2);padding:4px;border-radius:9px;border:1px solid #3a2e20;}
-  .tab{border:none;background:transparent;color:#c7b79b;font-family:'Inter',sans-serif;font-weight:600;font-size:13px;padding:7px 12px;border-radius:6px;cursor:pointer;}
+  .tab{border:none;background:transparent;color:#c7b79b;font-family:'Inter',sans-serif;font-weight:600;font-size:12.5px;padding:7px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;}
   .tab.active{background:var(--amber);color:#241c14;}
-  .controls input[type=date]{flex:1;min-width:140px;background:var(--bg-void-2);border:1px solid #3a2e20;color:var(--paper);border-radius:8px;padding:8px 10px;font-size:13px;}
+  .controls input[type=date]{flex:1;min-width:130px;background:var(--bg-void-2);border:1px solid #3a2e20;color:var(--paper);border-radius:8px;padding:8px 10px;font-size:13px;}
   .link-btn{background:none;border:none;color:var(--amber);font-size:12.5px;text-decoration:underline;cursor:pointer;padding:4px;}
+  .view-toggle{display:flex;gap:4px;background:var(--bg-void-2);padding:4px;border-radius:9px;border:1px solid #3a2e20;margin-left:auto;}
+  .view-toggle button{border:none;background:transparent;color:#c7b79b;font-size:12.5px;font-weight:600;padding:7px 10px;border-radius:6px;cursor:pointer;}
+  .view-toggle button.active{background:var(--amber);color:#241c14;}
+
+  #lista{display:flex;flex-direction:column;}
+  #lista.grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;align-items:start;}
+  #lista.grid-view .ticket{margin-bottom:0;}
 
   .order{padding:16px 18px 22px;}
   .order.entregado{opacity:.55;}
@@ -68,6 +84,7 @@
   .order-cliente{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;}
   .order-badge{font-family:'Space Mono',monospace;font-size:11px;padding:3px 8px;border-radius:20px;white-space:nowrap;height:fit-content;}
   .badge-pendiente{background:#f0d9ab;color:#7a4c10;}
+  .badge-camino{background:var(--teal-bg);color:var(--teal);}
   .badge-entregado{background:#d7e6cc;color:var(--green);}
   .badge-urgente{background:var(--rust);color:#fff;}
   .order-row{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:6px 0;border-bottom:1px dashed var(--line);}
@@ -75,13 +92,27 @@
   .order-row .k{color:var(--ink-soft);}
   .order-row .v{font-weight:600;text-align:right;}
   .order-notas{font-size:13px;color:var(--ink-soft);margin-top:8px;font-style:italic;}
-  .order-actions{display:flex;gap:8px;margin-top:12px;}
-  .mini-btn{flex:1;font-family:'Inter',sans-serif;font-weight:600;font-size:12.5px;padding:8px;border-radius:6px;border:1.5px solid var(--line);background:#fff;cursor:pointer;color:var(--ink);}
+  .order-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
+  .mini-btn{flex:1;min-width:84px;font-family:'Inter',sans-serif;font-weight:600;font-size:12px;padding:8px 6px;border-radius:6px;border:1.5px solid var(--line);background:#fff;cursor:pointer;color:var(--ink);}
   .mini-btn.done{border-color:var(--green);color:var(--green);}
+  .mini-btn.camino{border-color:var(--teal);color:var(--teal);}
   .mini-btn.reopen{border-color:var(--amber-dark);color:var(--amber-dark);}
   .mini-btn.danger{border-color:var(--rust);color:var(--rust);}
   .mini-btn.print{border-color:var(--ink-soft);}
+  .mini-btn.edit{border-color:var(--amber-dark);color:var(--amber-dark);}
   .empty{text-align:center;color:#a9967a;font-size:14px;padding:30px 10px;}
+
+  /* ---- resumen ---- */
+  .resumen-card{padding:18px 20px 24px;}
+  .resumen-card h2{font-family:'Bebas Neue',sans-serif;font-size:22px;margin:0 0 4px;border-bottom:2px dashed var(--line);padding-bottom:8px;}
+  .resumen-sub{color:var(--ink-soft);font-size:12px;margin:0 0 14px;}
+  .resumen-nums{display:flex;gap:14px;margin-bottom:14px;}
+  .resumen-num{flex:1;background:#f5ead3;border-radius:8px;padding:10px;text-align:center;}
+  .resumen-num b{display:block;font-family:'Space Mono',monospace;font-size:22px;}
+  .resumen-num span{font-size:11px;color:var(--ink-soft);}
+  .desglose-row{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0;border-bottom:1px dashed var(--line);}
+  .desglose-row:last-child{border-bottom:none;}
+  .desglose-row .v{font-weight:700;}
 
   #toast{
     position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);
@@ -103,6 +134,7 @@
     </div>
     <div class="stats">
       <div class="stat"><b id="statPend">0</b><span>pendientes</span></div>
+      <div class="stat"><b id="statCamino">0</b><span>en camino</span></div>
       <div class="stat"><b id="statHoy">0</b><span>hoy</span></div>
     </div>
   </header>
@@ -112,57 +144,99 @@
     <button id="notifyBtn" type="button">Activar avisos</button>
   </div>
 
-  <div class="ticket form-ticket">
-    <h2>Levantar pedido (manual)</h2>
-    <form id="orderForm" novalidate>
-      <div class="field full">
-        <label for="cliente">nombre del cliente</label>
-        <input type="text" id="cliente" required>
-      </div>
-      <div class="field full">
-        <label>productos</label>
-        <div id="lineItems"></div>
-        <button type="button" id="addLine" class="link-btn add-line">+ agregar otro producto</button>
-      </div>
-      <div class="field full">
-        <label for="domicilio">domicilio</label>
-        <textarea id="domicilio" required placeholder="Calle, número, colonia, referencias..."></textarea>
-      </div>
-      <div class="grid2">
-        <div class="field">
-          <label for="telefono">teléfono</label>
-          <input type="tel" id="telefono" required placeholder="10 dígitos">
-        </div>
-        <div class="field">
-          <label for="fecha">fecha de entrega</label>
-          <input type="date" id="fecha" required>
-        </div>
-      </div>
-      <div class="field full">
-        <label for="hora">hora de entrega</label>
-        <input type="time" id="hora" required>
-      </div>
-      <div class="field full">
-        <label for="notas">notas (opcional)</label>
-        <textarea id="notas" placeholder="Forma de pago, indicaciones extra..."></textarea>
-      </div>
-      <div class="error-msg" id="formError"></div>
-      <button type="submit" class="btn-primary" id="submitBtn">Levantar pedido</button>
-    </form>
+  <div class="main-tabs">
+    <button class="main-tab active" data-view="pedidos">Pedidos</button>
+    <button class="main-tab" data-view="nuevo">Nuevo pedido</button>
+    <button class="main-tab" data-view="resumen">Resumen</button>
   </div>
 
-  <div class="controls">
-    <div class="tabs">
-      <button class="tab active" data-filter="pendiente">Pendientes</button>
-      <button class="tab" data-filter="entregado">Entregados</button>
-      <button class="tab" data-filter="todos">Todos</button>
+  <!-- ===== VISTA: PEDIDOS ===== -->
+  <div class="view active" id="view-pedidos">
+    <div class="controls">
+      <div class="tabs">
+        <button class="tab active" data-filter="pendiente">Pendientes</button>
+        <button class="tab" data-filter="en_camino">En camino</button>
+        <button class="tab" data-filter="entregado">Entregados</button>
+        <button class="tab" data-filter="todos">Todos</button>
+      </div>
+      <div class="view-toggle">
+        <button class="active" data-mode="list">Lista</button>
+        <button data-mode="grid">Cuadrícula</button>
+      </div>
     </div>
-    <input type="date" id="filtroFecha">
-    <button class="link-btn" id="limpiarFecha" type="button">quitar filtro</button>
-    <button class="link-btn" id="refrescar" type="button">refrescar</button>
+    <div class="controls">
+      <input type="date" id="filtroFecha">
+      <button class="link-btn" id="limpiarFecha" type="button">quitar filtro</button>
+      <button class="link-btn" id="refrescar" type="button">refrescar</button>
+    </div>
+    <div id="lista"></div>
   </div>
 
-  <div id="lista"></div>
+  <!-- ===== VISTA: NUEVO PEDIDO ===== -->
+  <div class="view" id="view-nuevo">
+    <div class="ticket form-ticket">
+      <h2><span id="formTitulo">Levantar pedido (manual)</span>
+        <button type="button" class="cancel-edit" id="cancelEdit" style="display:none;">cancelar edición</button>
+      </h2>
+      <form id="orderForm" novalidate>
+        <div class="field full">
+          <label for="cliente">nombre del cliente</label>
+          <input type="text" id="cliente" required>
+        </div>
+        <div class="field full">
+          <label>productos</label>
+          <div id="lineItems"></div>
+          <button type="button" id="addLine" class="link-btn add-line">+ agregar otro producto</button>
+        </div>
+        <div class="field full">
+          <label for="domicilio">domicilio</label>
+          <textarea id="domicilio" required placeholder="Calle, número, colonia, referencias..."></textarea>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="telefono">teléfono</label>
+            <input type="tel" id="telefono" required placeholder="10 dígitos">
+          </div>
+          <div class="field">
+            <label for="fecha">fecha de entrega</label>
+            <input type="date" id="fecha" required>
+          </div>
+        </div>
+        <div class="field full">
+          <label for="hora">hora de entrega</label>
+          <input type="time" id="hora" required>
+        </div>
+        <div class="field full">
+          <label for="notas">notas (opcional)</label>
+          <textarea id="notas" placeholder="Forma de pago, indicaciones extra..."></textarea>
+        </div>
+        <div class="error-msg" id="formError"></div>
+        <button type="submit" class="btn-primary" id="submitBtn">Levantar pedido</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== VISTA: RESUMEN ===== -->
+  <div class="view" id="view-resumen">
+    <div class="ticket resumen-card">
+      <h2>Resumen de hoy</h2>
+      <p class="resumen-sub" id="resumenHoyFecha"></p>
+      <div class="resumen-nums">
+        <div class="resumen-num"><b id="hoyPedidos">0</b><span>pedidos entregados</span></div>
+        <div class="resumen-num"><b id="hoyArticulos">0</b><span>artículos vendidos</span></div>
+      </div>
+      <div id="hoyDesglose"></div>
+    </div>
+    <div class="ticket resumen-card">
+      <h2>Resumen de la semana</h2>
+      <p class="resumen-sub" id="resumenSemanaFecha"></p>
+      <div class="resumen-nums">
+        <div class="resumen-num"><b id="semPedidos">0</b><span>pedidos entregados</span></div>
+        <div class="resumen-num"><b id="semArticulos">0</b><span>artículos vendidos</span></div>
+      </div>
+      <div id="semDesglose"></div>
+    </div>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -183,15 +257,42 @@
   $('fecha').value = new Date().toISOString().slice(0,10);
   $('fechaHoy').textContent = new Date().toLocaleDateString('es-MX',{weekday:'long', day:'numeric', month:'long'});
 
-  function productOptionsHtml(){ return PRODUCTOS.map(p=>`<option value="${p}">${p}</option>`).join(''); }
-  function createLineRow(){
+  // ---------- navegación principal ----------
+  let editingId = null;
+
+  document.querySelectorAll('.main-tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const view = btn.dataset.view;
+      if(view === 'nuevo' && editingId === null){
+        resetForm();
+      }
+      document.querySelectorAll('.main-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      $('view-' + view).classList.add('active');
+      if(view === 'resumen') renderResumen();
+    });
+  });
+
+  function goToView(view){
+    document.querySelectorAll('.main-tab').forEach(b=>b.classList.toggle('active', b.dataset.view === view));
+    document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id === 'view-' + view));
+  }
+
+  // ---------- líneas de producto ----------
+  function productOptionsHtml(selected){
+    return PRODUCTOS.map(p=>`<option value="${p}" ${p===selected?'selected':''}>${p}</option>`).join('');
+  }
+  function createLineRow(prefill){
     const row = document.createElement('div');
     row.className = 'line-item';
+    const isCustom = prefill && !PRODUCTOS.includes(prefill.producto);
+    const selVal = prefill ? (isCustom ? 'Otro' : prefill.producto) : undefined;
     row.innerHTML = `
-      <select class="line-producto">${productOptionsHtml()}</select>
-      <input type="number" class="line-cantidad" min="1" value="1">
+      <select class="line-producto">${productOptionsHtml(selVal)}</select>
+      <input type="number" class="line-cantidad" min="1" value="${prefill ? prefill.cantidad : 1}">
       <button type="button" class="line-remove">&times;</button>
-      <input type="text" class="line-otro line-otro-input" style="display:none;" placeholder="especifica el producto">
+      <input type="text" class="line-otro line-otro-input" style="display:${isCustom?'block':'none'};" placeholder="especifica el producto" value="${isCustom ? escapeHtml(prefill.producto) : ''}">
     `;
     const sel = row.querySelector('.line-producto');
     const otro = row.querySelector('.line-otro-input');
@@ -207,11 +308,45 @@
   }
   function addLineRow(){ $('lineItems').appendChild(createLineRow()); updateRemoveButtons(); }
   function resetLineItems(){ $('lineItems').innerHTML=''; addLineRow(); }
+  function setLineItemsFromData(productos){
+    $('lineItems').innerHTML = '';
+    (productos.length ? productos : [null]).forEach(p => $('lineItems').appendChild(createLineRow(p)));
+    updateRemoveButtons();
+  }
   $('addLine').addEventListener('click', addLineRow);
   resetLineItems();
 
+  function resetForm(){
+    editingId = null;
+    $('orderForm').reset();
+    $('fecha').value = new Date().toISOString().slice(0,10);
+    resetLineItems();
+    $('formTitulo').textContent = 'Levantar pedido (manual)';
+    $('submitBtn').textContent = 'Levantar pedido';
+    $('cancelEdit').style.display = 'none';
+    $('formError').textContent = '';
+  }
+
+  function populateEditForm(o){
+    editingId = o.id;
+    $('cliente').value = o.cliente;
+    $('domicilio').value = o.domicilio;
+    $('telefono').value = o.telefono;
+    $('fecha').value = o.fecha;
+    $('hora').value = o.hora;
+    $('notas').value = o.notas || '';
+    setLineItemsFromData(productLines(o));
+    $('formTitulo').textContent = 'Editar pedido de ' + o.cliente;
+    $('submitBtn').textContent = 'Guardar cambios';
+    $('cancelEdit').style.display = 'inline';
+    $('formError').textContent = '';
+    goToView('nuevo');
+  }
+  $('cancelEdit').addEventListener('click', ()=>{ resetForm(); goToView('pedidos'); });
+
   let orders = [];
   let currentFilter = 'pendiente';
+  let currentMode = 'list';
   let loaded = false;
 
   function showToast(msg){
@@ -242,7 +377,7 @@
     }
   }
 
-  // ── nuevo pedido manual ──
+  // ---------- envío del formulario (nuevo o edición) ----------
   $('orderForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
     const errEl = $('formError');
@@ -276,18 +411,24 @@
     const btn = $('submitBtn');
     btn.disabled = true;
     try{
-      await api('/api/pedidos', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ cliente, productos, domicilio, telefono, fecha, hora, notas })
-      });
-      showToast('Pedido de ' + cliente + ' registrado.');
-      const keepFecha = fecha;
-      e.target.reset();
-      $('fecha').value = keepFecha;
-      resetLineItems();
+      if(editingId){
+        await api('/api/pedido?id=' + editingId, {
+          method:'PATCH',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ cliente, productos, domicilio, telefono, fecha, hora, notas })
+        });
+        showToast('Pedido de ' + cliente + ' actualizado.');
+      } else {
+        await api('/api/pedidos', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ cliente, productos, domicilio, telefono, fecha, hora, notas })
+        });
+        showToast('Pedido de ' + cliente + ' registrado.');
+      }
+      resetForm();
+      goToView('pedidos');
       await fetchOrders();
-      $('cliente').focus();
     }catch(err){
       errEl.textContent = err.message;
     }finally{
@@ -295,12 +436,21 @@
     }
   });
 
-  document.querySelectorAll('.tab').forEach(btn=>{
+  // ---------- filtros y vista lista/cuadrícula ----------
+  document.querySelectorAll('.tabs .tab').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tabs .tab').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       currentFilter = btn.dataset.filter;
       render();
+    });
+  });
+  document.querySelectorAll('.view-toggle button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.view-toggle button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentMode = btn.dataset.mode;
+      $('lista').classList.toggle('grid-view', currentMode === 'grid');
     });
   });
   $('filtroFecha').addEventListener('change', render);
@@ -314,13 +464,35 @@
     return h12+':'+String(m).padStart(2,'0')+' '+ap;
   }
   function isUrgente(o){
-    if(o.estado !== 'pendiente') return false;
+    if(o.estado === 'entregado') return false;
     const dt = new Date(o.fecha + 'T' + o.hora);
     const diffMin = (dt - new Date())/60000;
     return diffMin <= 30 && diffMin >= -60;
   }
   function escapeHtml(str){ const d=document.createElement('div'); d.textContent=str; return d.innerHTML; }
   function productLines(o){ return Array.isArray(o.productos) ? o.productos : []; }
+
+  function badgeHtml(o, urgente){
+    if(o.estado === 'entregado') return '<span class="order-badge badge-entregado">entregado</span>';
+    if(o.estado === 'en_camino') return '<span class="order-badge badge-camino">en camino</span>';
+    if(urgente) return '<span class="order-badge badge-urgente">entrega pronto</span>';
+    return '<span class="order-badge badge-pendiente">pendiente</span>';
+  }
+  function actionButtonsHtml(o){
+    let btns = '';
+    if(o.estado === 'pendiente'){
+      btns += `<button class="mini-btn camino" data-action="camino" data-id="${o.id}">En camino</button>`;
+    } else if(o.estado === 'en_camino'){
+      btns += `<button class="mini-btn done" data-action="done" data-id="${o.id}">Entregado</button>`;
+      btns += `<button class="mini-btn reopen" data-action="pendiente" data-id="${o.id}">Regresar</button>`;
+    } else {
+      btns += `<button class="mini-btn reopen" data-action="reopen" data-id="${o.id}">Reabrir</button>`;
+    }
+    btns += `<button class="mini-btn edit" data-action="edit" data-id="${o.id}">Editar</button>`;
+    btns += `<button class="mini-btn print" data-action="print" data-id="${o.id}">Imprimir</button>`;
+    btns += `<button class="mini-btn danger" data-action="delete" data-id="${o.id}">Eliminar</button>`;
+    return btns;
+  }
 
   function render(){
     if(!loaded) return;
@@ -336,7 +508,8 @@
 
     const today = new Date().toISOString().slice(0,10);
     $('statPend').textContent = orders.filter(o=>o.estado==='pendiente').length;
-    $('statHoy').textContent = orders.filter(o=>o.fecha===today && o.estado==='pendiente').length;
+    $('statCamino').textContent = orders.filter(o=>o.estado==='en_camino').length;
+    $('statHoy').textContent = orders.filter(o=>o.fecha===today && o.estado!=='entregado').length;
 
     if(filtered.length === 0){
       lista.innerHTML = '<div class="ticket"><div class="empty">No hay pedidos aquí todavía.</div></div>';
@@ -347,29 +520,18 @@
       const div = document.createElement('div');
       div.className = 'ticket order' + (o.estado==='entregado' ? ' entregado' : '');
       const urgente = isUrgente(o);
-      const badge = o.estado === 'entregado'
-        ? '<span class="order-badge badge-entregado">entregado</span>'
-        : urgente
-          ? '<span class="order-badge badge-urgente">entrega pronto</span>'
-          : '<span class="order-badge badge-pendiente">pendiente</span>';
 
       div.innerHTML = `
         <div class="order-top">
           <div class="order-cliente">${escapeHtml(o.cliente)}</div>
-          ${badge}
+          ${badgeHtml(o, urgente)}
         </div>
         ${productLines(o).map(li => `<div class="order-row"><span class="k">${escapeHtml(li.producto)}</span><span class="v">x${li.cantidad}</span></div>`).join('')}
         <div class="order-row"><span class="k">domicilio</span><span class="v">${escapeHtml(o.domicilio)}</span></div>
         <div class="order-row"><span class="k">teléfono</span><span class="v">${escapeHtml(o.telefono)}</span></div>
         <div class="order-row"><span class="k">entrega</span><span class="v">${fmtFecha(o.fecha)} · ${fmtHora(o.hora)}</span></div>
         ${o.notas ? `<div class="order-notas">${escapeHtml(o.notas)}</div>` : ''}
-        <div class="order-actions">
-          ${o.estado === 'pendiente'
-            ? `<button class="mini-btn done" data-action="done" data-id="${o.id}">Marcar entregado</button>`
-            : `<button class="mini-btn reopen" data-action="reopen" data-id="${o.id}">Reabrir</button>`}
-          <button class="mini-btn print" data-action="print" data-id="${o.id}">Imprimir</button>
-          <button class="mini-btn danger" data-action="delete" data-id="${o.id}">Eliminar</button>
-        </div>
+        <div class="order-actions">${actionButtonsHtml(o)}</div>
       `;
       lista.appendChild(div);
     });
@@ -384,13 +546,19 @@
     if(!order) return;
 
     try{
-      if(action === 'done'){
+      if(action === 'camino'){
+        await api('/api/pedido?id=' + id, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ estado:'en_camino' }) });
+        showToast('Pedido de ' + order.cliente + ' marcado en camino.');
+        await fetchOrders();
+      } else if(action === 'done'){
         await api('/api/pedido?id=' + id, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ estado:'entregado' }) });
         showToast('Pedido de ' + order.cliente + ' marcado como entregado.');
         await fetchOrders();
-      } else if(action === 'reopen'){
+      } else if(action === 'pendiente' || action === 'reopen'){
         await api('/api/pedido?id=' + id, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ estado:'pendiente' }) });
         await fetchOrders();
+      } else if(action === 'edit'){
+        populateEditForm(order);
       } else if(action === 'delete'){
         if(confirm('¿Eliminar el pedido de ' + order.cliente + '?')){
           await api('/api/pedido?id=' + id, { method:'DELETE' });
@@ -427,7 +595,44 @@
     setTimeout(()=>w.print(), 250);
   }
 
-  // ── avisos ──
+  // ---------- resumen ----------
+  function computeResumen(fromDateStr, toDateStr){
+    const entregados = orders.filter(o=> o.estado==='entregado' && o.fecha >= fromDateStr && o.fecha <= toDateStr);
+    const porProducto = {};
+    let totalArticulos = 0;
+    entregados.forEach(o=>{
+      productLines(o).forEach(li=>{
+        porProducto[li.producto] = (porProducto[li.producto]||0) + li.cantidad;
+        totalArticulos += li.cantidad;
+      });
+    });
+    return { totalPedidos: entregados.length, totalArticulos, porProducto };
+  }
+  function desgloseHtml(porProducto){
+    const entries = Object.entries(porProducto).sort((a,b)=>b[1]-a[1]);
+    if(entries.length === 0) return '<div class="empty" style="padding:14px 0;">Sin entregas registradas en este período.</div>';
+    return entries.map(([nombre, cant]) => `<div class="desglose-row"><span>${escapeHtml(nombre)}</span><span class="v">${cant}</span></div>`).join('');
+  }
+  function renderResumen(){
+    const today = new Date();
+    const todayStr = today.toISOString().slice(0,10);
+    const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate()-6);
+    const weekAgoStr = weekAgo.toISOString().slice(0,10);
+
+    const hoy = computeResumen(todayStr, todayStr);
+    $('resumenHoyFecha').textContent = today.toLocaleDateString('es-MX',{weekday:'long', day:'numeric', month:'long'});
+    $('hoyPedidos').textContent = hoy.totalPedidos;
+    $('hoyArticulos').textContent = hoy.totalArticulos;
+    $('hoyDesglose').innerHTML = desgloseHtml(hoy.porProducto);
+
+    const sem = computeResumen(weekAgoStr, todayStr);
+    $('resumenSemanaFecha').textContent = 'Del ' + fmtFecha(weekAgoStr) + ' al ' + fmtFecha(todayStr);
+    $('semPedidos').textContent = sem.totalPedidos;
+    $('semArticulos').textContent = sem.totalArticulos;
+    $('semDesglose').innerHTML = desgloseHtml(sem.porProducto);
+  }
+
+  // ---------- avisos ----------
   const notifyRow = $('notifyRow');
   const notifyBtn = $('notifyBtn');
   let notifyEnabled = false;
@@ -455,7 +660,7 @@
     if(!loaded) return;
     const now = new Date();
     orders.forEach(o=>{
-      if(o.estado !== 'pendiente' || avisados.has(o.id)) return;
+      if(o.estado === 'entregado' || avisados.has(o.id)) return;
       const dt = new Date(o.fecha + 'T' + o.hora);
       const diffMin = (dt - now) / 60000;
       if(diffMin <= 20 && diffMin >= -30){
