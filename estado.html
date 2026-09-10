@@ -110,7 +110,7 @@
       return;
     }
     try{
-      const res = await fetch('/api/estado?id=' + encodeURIComponent(id));
+      const res = await fetch('/api/estado?id=' + encodeURIComponent(id), { cache: 'no-store' });
       if(!res.ok){
         ticket.innerHTML = '<div class="error">No se encontró ese pedido. Puede que ya haya pasado tiempo o el link esté incompleto.</div>';
         return;
