@@ -29,6 +29,7 @@ module.exports = async (req, res) => {
       res.status(404).json({ error: 'No se encontró ese pedido.' });
       return;
     }
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
     res.status(200).json({ pedido: data });
   } catch (e) {
     res.status(500).json({ error: 'No se pudo consultar el pedido.' });
