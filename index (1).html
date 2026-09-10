@@ -155,7 +155,10 @@
     <h2>¡Pedido recibido!</h2>
     <p>Gracias, en un momento te lo llevamos.</p>
     <div class="resumen" id="resumen"></div>
-    <button class="otra-vez" id="otraVez">Hacer otro pedido</button>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:18px;">
+      <a href="#" id="verEstado" target="_blank" class="otra-vez" style="display:none;text-decoration:none;margin-top:0;">Ver estado de mi pedido</a>
+      <button class="otra-vez" id="otraVez" style="margin-top:0;">Hacer otro pedido</button>
+    </div>
   </div>
 </div>
 
@@ -249,6 +252,8 @@
         body: JSON.stringify({ cliente, productos, domicilio, telefono, fecha, hora, notas })
       });
       if(!res.ok) throw new Error('fallo');
+      const data = await res.json();
+      const pedidoId = data.pedido && data.pedido.id;
 
       $('formTicket').style.display = 'none';
       const resumen = $('resumen');
@@ -257,6 +262,12 @@
         ${productos.map(p=>`<div class="r"><span>${escapeHtml(p.producto)}</span><span>x${p.cantidad}</span></div>`).join('')}
         <div class="r"><span>Entrega</span><span>${fmtFecha(fecha)} · ${fmtHora(hora)}</span></div>
       `;
+      if(pedidoId){
+        $('verEstado').href = 'estado.html?id=' + encodeURIComponent(pedidoId);
+        $('verEstado').style.display = 'inline-block';
+      } else {
+        $('verEstado').style.display = 'none';
+      }
       $('successTicket').style.display = 'block';
       clearTimeout(window._volverTimer);
       window._volverTimer = setTimeout(volverAlFormulario, 15000);
