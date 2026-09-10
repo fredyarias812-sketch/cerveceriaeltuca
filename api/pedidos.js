@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
       if (error) throw error;
       res.status(200).json({ ok: true, pedido: data });
     } catch (e) {
-      res.status(500).json({ error: 'No se pudo guardar el pedido.', detalle: e.message || String(e) });
+      res.status(500).json({ error: 'No se pudo guardar el pedido.' });
     }
     return;
   }
@@ -43,6 +43,7 @@ module.exports = async (req, res) => {
       res.status(401).json({ error: 'No autorizado.' });
       return;
     }
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
     try {
       const { data, error } = await supabase
         .from('pedidos')
